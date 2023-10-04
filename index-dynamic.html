@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaflet Map</title>
+  <!-- Include Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    /* Add any custom CSS styles here */
+    body { margin: 0; }
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <!-- Map container -->
+  <div id="map"></div>
+
+  <!-- Include Leaflet JavaScript -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+
+    const map = L.map('map');
+
+    const osmTileLayerUrl = 'http://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    const osmTileLayer = L.tileLayer(osmTileLayerUrl, {
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      subdomains: '1234', // Replace with appropriate HERE Maps subdomains
+      base: 'base',
+      style: 'normal.day', // Adjust the style if needed (e.g., normal.day, satellite.day)
+      size: '256', // Tile size
+      format: 'png8', // Image format,
+      maxZoom: 19
+    });
+
+    osmTileLayer.addTo(map);
+
+    const dataUrl = 'https://gist.githubusercontent.com/up42-epicycles/3b0911d9e34a0e3d89d67c6d551cc105/raw/e1f5ecaad00adcfcde9666100cb9fbbde27d4759/allowed.geojson'; // Replace with your GeoJSON data URL
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataUrlParam = urlParams.get('dataUrl');
+
+    // Ensure 'dataUrl' parameter exists in the URL
+    if (dataUrlParam) {
+      // Fetch GeoJSON data dynamically from the specified data URL
+      fetch(dataUrlParam)
+        .then(response => response.json())
+        .then(data => {
+          const geoJSONLayer = L.geoJSON(data);
+          geoJSONLayer.addTo(map);
+
+          const bounds = geoJSONLayer.getBounds();
+          map.fitBounds(bounds, { maxZoom: 14 });
+        })
+        .catch(error => console.error('Error loading GeoJSON data:', error));
+    } else {
+      console.error('No dataUrl parameter found in the URL.');
+    }
+
+  // Assuming you have a variable 'geojsonData' containing your GeoJSON data
+  const geoJSONLayer = L.geoJSON(geojsonData);
+  geoJSONLayer.addTo(map);
+
+  // Get the bounds of the GeoJSON layer
+  const bounds = geoJSONLayer.getBounds();
+
+  // Fit the map to the bounds of the GeoJSON layer
+  map.fitBounds(bounds, { maxZoom: 14 });
+  </script>
+
+</body>
+</html>
